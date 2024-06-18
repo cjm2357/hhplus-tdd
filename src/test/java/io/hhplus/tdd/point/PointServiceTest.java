@@ -1,8 +1,7 @@
 package io.hhplus.tdd.point;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
 
 
 import static org.assertj.core.api.Assertions.*;
@@ -29,6 +28,8 @@ public class PointServiceTest {
      * 3. 기존 id에 충전
      * 4. 동시에 여러건의 포인트 충전, 이용 요청
      * */
+    
+    //우선 test 코드 case3 까지 구현
     @Test
     void 첫_포인트_충전_호출 () throws Exception {
         //given

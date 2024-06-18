@@ -13,6 +13,7 @@ public class PointService {
         this.pointRepository = pointRepository;
     }
 
+    //case 추가 순서
     public UserPoint charge(Long id, Long amount) throws Exception {
         //case 2 : 0이하의 수 충전으로 인한 코드 추가
         if (amount < 0) throw new Exception("0이하의 수는 충전할 수 없습니다.");
