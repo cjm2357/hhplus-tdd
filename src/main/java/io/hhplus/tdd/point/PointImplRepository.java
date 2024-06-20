@@ -8,10 +8,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PointImplRepository implements PointRepository {
 
-    private UserPointTable userPointTable = new UserPointTable();
+    private UserPointTable userPointTable;
+    public PointImplRepository(UserPointTable userPointTable) {
+        this.userPointTable = userPointTable;
+    }
 
     @Override
-    public UserPoint selectById(long id) {
+    public UserPoint findById(long id) {
         return userPointTable.selectById(id);
     }
 
