@@ -166,14 +166,13 @@ public class PointControllerUnitTest {
         long amount = 100;
 
         //여기타입이 안먹는 것 같은데 어떻게 해결하나요?
-        String requestJson = "{\"amount\":" + amount + "}";
         when(pointService.charge(anyLong(),anyLong())).thenReturn(new UserPoint(userId, amount, System.currentTimeMillis()));
 
         //when
         //then
         mvc.perform(patch("/point/"+ userId + "/charge")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(String.valueOf(amount)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.point").value(amount));
@@ -185,15 +184,13 @@ public class PointControllerUnitTest {
         long userId = 1;
         long amount = -1000;
 
-        //여기타입이 안먹는 것 같은데 어떻게 해결하나요?
-        String requestJson = "{\"amount\":" + amount + "}";
         when(pointService.charge(anyLong(),anyLong())).thenThrow(new Exception("0이하의 수는 충전할 수 없습니다."));
 
         //when
         //then
         mvc.perform(patch("/point/"+ userId + "/charge")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(String.valueOf(amount)))
                 .andExpect(status().is5xxServerError());
     }
 
@@ -204,14 +201,13 @@ public class PointControllerUnitTest {
         long amount1 = 1000;
         long amount2 = 500;
 
-        String requestJson = "{\"amount\":" + amount2 + "}";
         when(pointService.charge(anyLong(),anyLong())).thenReturn(new UserPoint(userId, amount1 + amount2, System.currentTimeMillis()));
 
         //when
         //then
         mvc.perform(patch("/point/"+ userId + "/charge")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(String.valueOf(amount2)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.point").value(amount1+amount2));
@@ -233,14 +229,13 @@ public class PointControllerUnitTest {
         long userId = 1;
         long amount = 1000;
         long usePoint = 300;
-        String requestJson = "{\"amount\":" + usePoint + "}";
         when(pointService.use(anyLong(),anyLong())).thenReturn(new UserPoint(userId, amount-usePoint, System.currentTimeMillis()));
 
         //when
         //then
-        mvc.perform(patch("/point/"+ userId + "/charge")
+        mvc.perform(patch("/point/"+ userId + "/use")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(String.valueOf(usePoint)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.point").value(amount-usePoint));
@@ -252,14 +247,13 @@ public class PointControllerUnitTest {
         //given
         long userId = 1;
         long usePoint = -300;
-        String requestJson = "{\"amount\":" + usePoint + "}";
-        when(pointService.charge(anyLong(),anyLong())).thenThrow(new Exception("0이하의 수는 사용할 수 없습니다."));
+        when(pointService.use(anyLong(),anyLong())).thenThrow(new Exception("0이하의 수는 사용할 수 없습니다."));
 
         //when
         //then
         mvc.perform(patch("/point/"+ userId + "/use")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(String.valueOf(usePoint)))
                 .andExpect(status().is5xxServerError());
 
     }
@@ -271,14 +265,13 @@ public class PointControllerUnitTest {
         //given
         long userId = 1;
         long usePoint = 300;
-        String requestJson = "{\"amount\":" + usePoint + "}";
-        when(pointService.charge(anyLong(),anyLong())).thenThrow(new Exception("잔여 포인트보다 많이 사용할 수 없습니다."));
+        when(pointService.use(anyLong(),anyLong())).thenThrow(new Exception("잔여 포인트보다 많이 사용할 수 없습니다."));
 
         //when
         //then
         mvc.perform(patch("/point/"+ userId + "/use")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(String.valueOf(usePoint)))
                 .andExpect(status().is5xxServerError());
     }
 }

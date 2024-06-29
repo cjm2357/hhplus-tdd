@@ -5,6 +5,7 @@ import io.hhplus.tdd.database.UserPointTable;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -255,6 +256,43 @@ public class PointServiceIntegrationTest {
 
         //then
         assertTrue(isAfterTime(pointHistories.get(0).updateMillis(), pointHistories.get(1).updateMillis()));
+    }
+
+    @Test
+    void 동시성테스트() throws Exception{
+        // given
+        pointService.charge(1l, 100000l);
+        // when
+
+        CompletableFuture.allOf(
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        pointService.use(1l, 10000l);
+                    } catch (Exception e) {
+
+                    }
+                }),
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        pointService.charge(1l, 4000l);
+                    } catch (Exception e) {
+
+                    }
+                }),
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        pointService.use(1l, 100l);
+                    } catch (Exception e) {
+
+                    }
+                })
+        ).join(); // 제일 오래 끝나는거 끝날떄까지 기다려줌. = 내가 비동기/병렬로 실행한 함수가 전부 끝남을 보장.
+
+
+        // then
+        UserPoint userPoint = pointService.search(1);
+        // 수식으로 검증해서 테스트 작성자의 오류도 줄인다.
+        assertThat(userPoint.point()).isEqualTo(100000 - 10000 + 4000 - 100);
     }
 
 
